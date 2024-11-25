@@ -1,0 +1,68 @@
+% Facts
+fact(a).
+fact(b).
+ 
+% Rules
+rule1 :- fact(a), assert(fact(c)).
+rule2 :- fact(b), assert(fact(d)).
+ 
+% ==========================
+% Forward Chaining Implementation
+% ==========================
+% Forward Chaining Mechanism
+forward_chain :-
+    repeat,  % Repeat until no new facts are generated
+    fact(X),  % Find a known fact
+    (rule1; rule2),  % Apply rules to generate new facts
+    \+ fact(X),  % Prevent already known facts from being re-applied
+    !.  % Exit when no new facts are generated
+ 
+% Run the Forward Chaining process
+start_forward_chain :-
+    forward_chain,
+    write('Forward chaining complete.'), nl,
+    write('New facts derived: '), nl,
+    (fact(F), write(F), nl, fail; true).  % Print derived facts
+ 
+% ============================
+% Backward Chaining Implementation
+% ============================
+% Backward Chaining Mechanism
+backward_chain(Goal) :-
+    (fact(Goal) -> true;  % If the goal is a fact, succeed
+     (rule1, Goal) -> true;  % If the goal can be derived from rule1
+     (rule2, Goal) -> true).  % If the goal can be derived from rule2
+ 
+% To run backward chaining, pass a goal
+start_backward_chain :-
+    write('Backward chaining result: '), nl,
+    backward_chain(c),  % Example goal: Is fact(c) true?
+    write('Goal reached: c'), nl.
+ 
+% ===========================
+% Resolution Strategy Implementation
+% ===========================
+% Query that Prolog will resolve
+resolution_query :-
+    fact(a),  % This will be resolved directly using the facts
+    write('Fact a is true.'), nl.
+% To test a resolution where a fact isn't known
+resolution_test :-
+    \+ fact(x),  % Querying a fact that is false
+    write('Fact x is not true.'), nl.
+ 
+% Run the resolution example
+start_resolution_test :-
+    resolution_query, 
+    resolution_test.
+ 
+% =======================
+% Start the experiment
+% =======================
+run_experiment :-
+    write('Starting Forward Chaining...'), nl,
+    start_forward_chain,
+    write('Starting Backward Chaining...'), nl,
+    start_backward_chain,
+    write('Starting Resolution Strategy...'), nl,
+    start_resolution_test.
